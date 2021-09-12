@@ -10,7 +10,7 @@ Library
 
 Tests
 - src/test.cpp -> Tests (Binary:textNumberConverter_test)
-- src/main.cpp -> Application which requests to enter texts and converts them using the library
+- src/main.cpp -> Application which requests to enter texts and converts them using the library (Binary: textNumberConverter_main)
 
 GCOV coverage report
 - textNumberConverter_coverage/index.html
@@ -29,7 +29,7 @@ How to compile to get GCOV coverage information:
 
 $cmake -DCOVERAGE=ON ..
 
-$make textNumberConverter_coverate
+$make textNumberConverter_coverage
 
 
 
