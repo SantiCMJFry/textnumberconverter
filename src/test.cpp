@@ -32,7 +32,6 @@
 int main()
 {
 
-    //Test 1
     {
         std::string input("Hello one hundred twenty-three million four hundred fifty-six thousand seven hundred eighty-nine; How are you nine hundred eighty-seven million six hundred fifty-four thousand three hundred twenty-one");
         std::string generated;
@@ -56,6 +55,41 @@ int main()
         ASSERT_EQUAL(true, ret);
         CHECK_STEP(input, "111111111. 222222222, 333333333; 444444444: 555555555! 666666666? 777777777) 888888888| 999999999/", generated);
     }
+
+    {
+        std::string input("one hundred eleven million one hundred eleven thousand one hundred eleven."
+                          "two hundred twenty-two million two hundred twenty-two thousand two hundred twenty-two.");
+        std::string generated;
+        bool ret = TextNumberConverter::textToNumber(input, generated);
+        ASSERT_EQUAL(false, ret);
+    }
+
+    {
+        std::string input("Spider-man one hundred eleven million one hundred eleven thousand one hundred eleven.");
+        std::string generated;
+        bool ret = TextNumberConverter::textToNumber(input, generated);
+        CHECK_STEP(input, "Spider-man 111111111.", generated);
+        ASSERT_EQUAL(true, ret);
+    }
+
+    {
+        std::string input("Forty-four");
+        std::string generated;
+        bool ret = TextNumberConverter::textToNumber(input, generated);
+        CHECK_STEP(input, "44", generated);
+        ASSERT_EQUAL(true, ret);
+    }
+
+    {
+        std::string input("forty-four");
+        std::string generated;
+        bool ret = TextNumberConverter::textToNumber(input, generated);
+        CHECK_STEP(input, "44", generated);
+        ASSERT_EQUAL(true, ret);
+    }
+
+
+
 
     {
         std::string input("I'll give you one billion five hundred forty-five million one hundred fifty-six thousand dollars for this bank; If you don't accept, then you will pay me five hundred million every month");
