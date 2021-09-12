@@ -18,13 +18,17 @@ GCOV coverage report
 How to compile (From the root):
 
 $mkdir build
+
 $cd build
+
 $cmake ..
+
 $make
 
 How to compile to get GCOV coverage information:
 
 $cmake -DCOVERAGE=ON ..
+
 $make textNumberConverter_coverate
 
 
