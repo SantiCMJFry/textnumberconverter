@@ -4,13 +4,14 @@ project(textNumberConverter C CXX)
 message("-----------------------------------------------------------")
 message("Creating makefile of ${PROJECT_NAME} as ${CMAKE_BUILD_TYPE}")
 
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
-
-if(DEFINED COVERAGE)
-LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules")
-include(CodeCoverage)
-APPEND_COVERAGE_COMPILER_FLAGS() 
-setup_target_for_coverage_lcov(NAME ${PROJECT_NAME}_coverage  EXECUTABLE ${PROJECT_NAME}_test )
+if(UNIX)
+    set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
+    if(DEFINED COVERAGE)
+        LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules")
+        include(CodeCoverage)
+        APPEND_COVERAGE_COMPILER_FLAGS() 
+        setup_target_for_coverage_lcov(NAME ${PROJECT_NAME}_coverage  EXECUTABLE ${PROJECT_NAME}_test)
+    endif()
 endif()
 
 set(HEADERS
