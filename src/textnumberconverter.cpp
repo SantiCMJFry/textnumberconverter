@@ -2,8 +2,12 @@
 #include <iostream>
 #include <cstring>
 #include <algorithm>
+#include <array>
 
 #include <textnumberconverter.hpp>
+
+
+// Initialization of static members
 
 const char * TextNumberConverter::BILLION = "billion";
 const char * TextNumberConverter::MILLION = "million";
@@ -57,15 +61,19 @@ std::unordered_map<std::string, uint8_t> TextNumberConverter::specialMap =
    {"ninety-", 90},
 };
 
-std::string TextNumberConverter::textToNumber(const std::string & text)
+bool TextNumberConverter::textToNumber(const std::string & text, std::string & textConverted)
 {
+    bool ret = true;
     const size_t INIT_POS = 0;
+    const std::array<char,9>symbols= {',','.',';',':','!','?',')','|','/'};
     size_t endingPos = std::string::npos;
     size_t dashPos = std::string::npos;
     size_t firstNumberPos = std::string::npos;
     size_t lastNumberPos = std::string::npos;
+    size_t symbolPos = std::string::npos;
     std::string localText(text + " ");
     std::string wordNumber;
+    std::string finalString;
     uint32_t finalNumber = 0;
     uint32_t currentNumber = 0;
     uint32_t specialNumber = 0;
@@ -75,14 +83,18 @@ std::string TextNumberConverter::textToNumber(const std::string & text)
     bool firstWord = true;
     bool special = false;
 
-    //convert to lowercase
+    //convert the text to lowercase
     std::for_each(localText.begin(), localText.end(), [](char &c)
                   { c = ::tolower(c); });
 
+
+    //Iterate the whole text
     while (!localText.empty())
     {
         endingPos = localText.find(TextNumberConverter::WHITE_SPACE);
         dashPos = localText.find(TextNumberConverter::DASH);
+
+        //First check if we have a special case (cases like twenty-one, thirty-two... etc)
         if ((endingPos != std::string::npos) && (endingPos != std::string::npos) && (dashPos < endingPos))
         {
             wordNumber = localText.substr(INIT_POS, dashPos + 1);
@@ -105,12 +117,40 @@ std::string TextNumberConverter::textToNumber(const std::string & text)
             lastNumberPos+=(dashPos+1);
             continue;
         }
-
+        
         endingPos = localText.find(TextNumberConverter::WHITE_SPACE);
+
+        //Check special symbols (',','.',';',':','!','?',')','|','/')
+        symbolPos = std::string::npos;
+        for (uint8_t i = 0; i<symbols.size();i++)
+        {
+            size_t symbolPosAux = localText.find(symbols[i]);
+
+            if ((std::string::npos != symbolPosAux) && (symbolPosAux<endingPos))
+            {
+                if ((std::string::npos == symbolPos) || (symbolPosAux < symbolPos))
+                {
+                    symbolPos = symbolPosAux;
+                }
+            }
+        }
+        if ((std::string::npos != symbolPos) && (symbolPos < endingPos))
+        {
+            if (endingPos != symbolPos+1)
+            {
+                //Bad format detected, there is no whitespace after the detected number
+                return false;
+                std::cout << "updated " << localText << std::endl;
+            }
+            endingPos = symbolPos;
+        }
+
+        //Get numbers
         if (endingPos != std::string::npos)
         {
             wordNumber = localText.substr(INIT_POS, endingPos);
             localText = localText.substr(endingPos + 1, localText.length());
+
             if (numbersMap.find(wordNumber) != numbersMap.end())
             {
                 if (std::string::npos == firstNumberPos)
@@ -153,6 +193,7 @@ std::string TextNumberConverter::textToNumber(const std::string & text)
             {   
                 break;
             }
+
             lastNumberPos+=(endingPos+1);
             continue;
         }
@@ -161,15 +202,18 @@ std::string TextNumberConverter::textToNumber(const std::string & text)
     firstNumberPos = (std::string::npos == firstNumberPos) ? 0 : firstNumberPos;
     lastNumberPos = (std::string::npos == lastNumberPos) ? 0 : lastNumberPos;
     finalNumber=billions+millions+thousands+currentNumber;
-    std::string finalString = text.substr(0,firstNumberPos) + std::to_string(finalNumber) +  text.substr(lastNumberPos);
 
+    finalString = text.substr(0,firstNumberPos) + std::to_string(finalNumber) +  text.substr(lastNumberPos);
+
+    //if there is more text to analyze call the same function recursively
     if (TextNumberConverter::ZERO != finalString)
     {
-        finalString = textToNumber(finalString);
+        ret =  textToNumber(finalString, textConverted);
     }
     else
     {
-        finalString = text;
+        textConverted = text;
     }
-    return finalString;
+    
+    return ret;
 }

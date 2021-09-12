@@ -18,13 +18,20 @@ target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURR
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${HEADERS}")
 
-
 set(TEST_SOURCES
-    src/main.cpp)
+    src/test.cpp)
 
 add_executable(${PROJECT_NAME}_test ${TEST_SOURCES})
 
 target_link_libraries (${PROJECT_NAME}_test PRIVATE ${PROJECT_NAME})
+
+set(MAIN_SOURCES
+    src/main.cpp)
+
+add_executable(${PROJECT_NAME}_main ${MAIN_SOURCES})
+
+target_link_libraries (${PROJECT_NAME}_main PRIVATE ${PROJECT_NAME})
+
 
 
 
